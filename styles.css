@@ -80,6 +80,17 @@ textarea {
     align-items: end;
 }
 
+.dataset-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 0.5rem;
+    background: #f1f5f9;
+    padding: 0.6rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    align-items: end;
+}
+
 .btn {
     background: var(--primary);
     color: #fff;

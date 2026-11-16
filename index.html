@@ -69,24 +69,32 @@
         </details>
 
         <details open>
-            <summary>Reference publication</summary>
+            <summary>Machine learning model</summary>
             <div class="form-grid">
-                <div class="full-width">
-                    <label>Title</label>
-                    <input type="text" id="journal_article_title" placeholder="My cool software">
+                <div>
+                    <label>Link to information about the model</label>
+                    <input type="text" class="ml_model_info_link" required placeholder="https://www.mlmodelinfo.com">
                 </div>
-            </div>
-            <div class="form-grid">
-                <div class="full-width">
-                    <label>Unique identifier</label>
-                    <input type="text" id="journal_article_URI" placeholder="https://doi.org/10000/10000">
+                <div>
+                    <label>ML model category</label>
+                    <select class="p-role">
+                        <option value="author">author</option>
+                        <option value="contributor">contributor</option>
+                        <option value="maintainer">maintainer</option>
+                    </select>
                 </div>
             </div>
             <div class="add-section">
+                <label>Dataset</label>
+                <div id="datasetsContainer"></div>
+                <button type="button" class="btn btn-sec" id="addDatasetButton">+ Add Dataset</button>
+            </div>
+
+            <!-- <div class="add-section">
                 <label>Author</label>
                 <div id="peopleContainer"></div>
                 <button type="button" class="btn btn-sec" id="addPersonButton">+ Add Person</button>
-            </div>
+            </div> -->
         </details>
 
         <div class="action-buttons">
