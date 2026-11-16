@@ -66,14 +66,19 @@ function addDatasetRow() {
     row.className = 'dataset-row';
     row.innerHTML = `
         <div>
-            <label>Title *</label>
-            <input type="text" class="journal_article_title" required placeholder="My cool software">
+            <label>Dataset name</label>
+            <input type="text" class="journal_article_title" placeholder="My cool dataset">
         </div>
         <div>
-            <label>DOI</label>
-            <input type="text" class="doi" placeholder="https://doi.org/10000/10000">
+            <label>Dataset URL</label>
+            <input type="text" class="url" placeholder="http://www.their-dataset.com">
+        </div> 
+        <button type="button" class="btn btn-del">X</button>        
+        <div >
+            <label>Ethical, legal, and/or social aspects of this dataset</label>
+            <input type="text" class="url" placeholder="This dataset has alleged copyright violations...">
         </div>
-        <button type="button" class="btn btn-del">X</button>
+        
     `;
     document.getElementById('datasetsContainer').appendChild(row);
 }

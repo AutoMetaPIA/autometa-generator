@@ -83,12 +83,20 @@ textarea {
 .dataset-row {
     display: grid;
     grid-template-columns: 1fr 1fr auto;
+    grid-template-rows: 1fr auto;
     gap: 0.5rem;
     background: #f1f5f9;
     padding: 0.6rem;
     border-radius: 4px;
     margin-bottom: 0.5rem;
     align-items: end;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
 }
 
 .btn {
