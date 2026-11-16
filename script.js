@@ -32,8 +32,8 @@ function addPublicationRow() {
     row.className = 'publication-row';
     row.innerHTML = `
         <div>
-            <label>Title</label>
-            <input type="text" class="journal_article_title" placeholder="My cool software">
+            <label>Title *</label>
+            <input type="text" class="journal_article_title" required placeholder="My cool software">
         </div>
         <div>
             <label>DOI</label>
@@ -42,6 +42,23 @@ function addPublicationRow() {
         <button type="button" class="btn btn-del">X</button>
     `;
     document.getElementById('publicationsContainer').appendChild(row);
+}
+
+function addReviewPublicationRow() {
+    const row = document.createElement('div');
+    row.className = 'publication-row';
+    row.innerHTML = `
+        <div>
+            <label>Title *</label>
+            <input type="text" class="journal_article_title" required placeholder="My cool software">
+        </div>
+        <div>
+            <label>DOI</label>
+            <input type="text" class="doi" placeholder="https://doi.org/10000/10000">
+        </div>
+        <button type="button" class="btn btn-del">X</button>
+    `;
+    document.getElementById('reviewPublicationsContainer').appendChild(row);
 }
 
 document.getElementById('addPersonButton').addEventListener('click', addPersonRow);
@@ -59,6 +76,15 @@ document.getElementById('publicationsContainer').addEventListener('click', event
     const removeButton = event.target.closest('.btn-del');
     if (removeButton) removeButton.closest('.publication-row').remove();
 });
+
+document.getElementById('addReviewPublicationButton').addEventListener('click', addReviewPublicationRow);
+document.getElementById('reviewPublicationsContainer').addEventListener('click', event => {
+    if (!(event.target instanceof Element)) return;
+
+    const removeButton = event.target.closest('.btn-del');
+    if (removeButton) removeButton.closest('.publication-row').remove();
+});
+
 document.getElementById('generateSQLButton').addEventListener('click', generateSQL);
 document.getElementById('submitViaWebPRButton').addEventListener('click', () => submitViaWebPR());
 document.getElementById('submitViaGitHubAPIButton').addEventListener('click', () => submitViaGitHubAPI());
@@ -67,6 +93,7 @@ addPersonRow();
 
 addPublicationRow();
 
+addReviewPublicationRow();
 
 function sqlVal(v) {
     if (!v || !v.trim()) return 'NULL';
