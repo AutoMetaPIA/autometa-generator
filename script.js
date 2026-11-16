@@ -27,6 +27,23 @@ function addPersonRow() {
     document.getElementById('peopleContainer').appendChild(row);
 }
 
+function addPublicationRow() {
+    const row = document.createElement('div');
+    row.className = 'publication-row';
+    row.innerHTML = `
+        <div>
+            <label>Title</label>
+            <input type="text" class="journal_article_title" placeholder="My cool software">
+        </div>
+        <div>
+            <label>DOI</label>
+            <input type="text" class="doi" placeholder="https://doi.org/10000/10000">
+        </div>
+        <button type="button" class="btn btn-del">X</button>
+    `;
+    document.getElementById('publicationsContainer').appendChild(row);
+}
+
 document.getElementById('addPersonButton').addEventListener('click', addPersonRow);
 document.getElementById('peopleContainer').addEventListener('click', event => {
     if (!(event.target instanceof Element)) return;
@@ -34,11 +51,22 @@ document.getElementById('peopleContainer').addEventListener('click', event => {
     const removeButton = event.target.closest('.btn-del');
     if (removeButton) removeButton.closest('.person-row').remove();
 });
+
+document.getElementById('addPublicationButton').addEventListener('click', addPublicationRow);
+document.getElementById('publicationsContainer').addEventListener('click', event => {
+    if (!(event.target instanceof Element)) return;
+
+    const removeButton = event.target.closest('.btn-del');
+    if (removeButton) removeButton.closest('.publication-row').remove();
+});
 document.getElementById('generateSQLButton').addEventListener('click', generateSQL);
 document.getElementById('submitViaWebPRButton').addEventListener('click', () => submitViaWebPR());
 document.getElementById('submitViaGitHubAPIButton').addEventListener('click', () => submitViaGitHubAPI());
 
 addPersonRow();
+
+addPublicationRow();
+
 
 function sqlVal(v) {
     if (!v || !v.trim()) return 'NULL';
@@ -98,6 +126,21 @@ function generateSQL() {
             } else {
                 lines.push(`INSERT INTO people (given_name, family_name, orcid) SELECT ${sqlVal(given)}, ${sqlVal(family)}, NULL WHERE NOT EXISTS (SELECT 1 FROM people WHERE given_name = ${sqlVal(given)} AND family_name = ${sqlVal(family)});`);
                 lines.push(`INSERT INTO resource_roles (resource_id, person_id, role_name) VALUES ((SELECT id FROM resources WHERE url = ${sqlVal(url)}), (SELECT id FROM people WHERE given_name = ${sqlVal(given)} AND family_name = ${sqlVal(family)} LIMIT 1), ${sqlVal(role)});`);
+            }
+        }
+    });
+
+
+// . Publication
+    document.querySelectorAll('.publication-row').forEach(row => {
+        const given = row.querySelector('.journal_article_title').value.trim();
+        const orcid = row.querySelector('.doi').value.trim();
+
+        if (given && family) {
+            if (doi) {
+                lines.push(`INSERT OR IGNORE INTO publications (title, doi) VALUES (${sqlVal(title)}, ${sqlVal(doi)});`);
+            } else {
+                lines.push(`INSERT INTO publications (title, doi) SELECT ${sqlVal(title)}, NULL WHERE NOT EXISTS (SELECT 1 FROM publications WHERE given_name = ${sqlVal(title)} );`);
             }
         }
     });

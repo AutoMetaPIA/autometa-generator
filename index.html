@@ -42,46 +42,43 @@
             <summary>Software</summary>
             <div class="form-grid">
                 <div>
-                    <label>Name / Title *</label>
-                    <input type="text" id="name" required placeholder="e.g., Open Climate Dataset">
+                    <label>Software name *</label>
+                    <input type="text" id="software_name" required placeholder="Their Software">
                 </div>
                 <div>
-                    <label>Primary URL *</label>
-                    <input type="url" id="url" required placeholder="https://example.org">
-                </div>
-                <div>
-                    <label>Category</label>
-                    <input type="text" id="category" placeholder="Dataset, Software, Documentation">
-                </div>
-                <div>
-                    <label>Identifier (DOI / UUID)</label>
-                    <input type="text" id="identifier" placeholder="10.5281/zenodo.999999">
-                </div>
-                <div>
-                    <label>License (SPDX)</label>
-                    <input type="text" id="license" placeholder="CC-BY-4.0">
-                </div>
-                <div>
-                    <label>Version</label>
-                    <input type="text" id="version" placeholder="1.0.0">
+                    <label>Website link</label>
+                    <input type="url" id="software_website_link" placeholder="https://example.org">
                 </div>
                 <div class="full-width">
-                    <label>Description</label>
-                    <textarea id="description" rows="2"></textarea>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="is_accessible_freely">
+                        <span>Is accessible for free</span>
+                    </label>
                 </div>
+            </div>
+            <div class="publications-section">
+                <label>Reference publication</label>
+                <div id="publicationsContainer"></div>
+                <button type="button" class="btn btn-sec" id="addPublicationButton">+ Add Publication</button>
             </div>
         </details>
 
         <details open>
-            <summary>2. Keywords & People</summary>
+            <summary>Reference publication</summary>
             <div class="form-grid">
                 <div class="full-width">
-                    <label>Keywords (comma-separated)</label>
-                    <input type="text" id="keywords" placeholder="climate, hydrology, open-data">
+                    <label>Title</label>
+                    <input type="text" id="journal_article_title" placeholder="My cool software">
+                </div>
+            </div>
+            <div class="form-grid">
+                <div class="full-width">
+                    <label>Unique identifier</label>
+                    <input type="text" id="journal_article_URI" placeholder="https://doi.org/10000/10000">
                 </div>
             </div>
             <div class="people-section">
-                <label>Authors & Contributors</label>
+                <label>Author</label>
                 <div id="peopleContainer"></div>
                 <button type="button" class="btn btn-sec" id="addPersonButton">+ Add Person</button>
             </div>
