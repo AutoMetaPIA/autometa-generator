@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        http-equiv="Content-Security-Policy"
+        content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; form-action 'self'"
+    >
+    <title>Collaborative AutoMeta v0.0 Relational Generator</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+
+    <h1>Collaborative Relational Metadata Generator</h1>
+    <p class="muted-copy">
+        Generates conflict-free SQL migration scripts and opens a GitHub Pull Request for review.
+    </p>
+
+    <!-- Target Repository Config -->
+    <div class="gh-config">
+        <strong>Target GitHub Repository</strong>
+        <div class="form-grid repo-grid">
+            <div>
+                <label>GitHub Owner / Org</label>
+                <input type="text" id="ghOwner" value="AutoMetaPIA">
+            </div>
+            <div>
+                <label>Repository Name</label>
+                <input type="text" id="ghRepo" value="auto-meta-generator">
+            </div>
+            <!-- <div>
+                <label>GitHub Personal Access Token (Optional)</label>
+                <input type="password" id="ghToken" placeholder="Leave blank to use browser web PR">
+            </div> -->
+        </div>
+    </div>
+
+    <form id="metaForm">
+        <details open>
+            <summary>Software</summary>
+            <div class="form-grid">
+                <div>
+                    <label>Name / Title *</label>
+                    <input type="text" id="name" required placeholder="e.g., Open Climate Dataset">
+                </div>
+                <div>
+                    <label>Primary URL *</label>
+                    <input type="url" id="url" required placeholder="https://example.org">
+                </div>
+                <div>
+                    <label>Category</label>
+                    <input type="text" id="category" placeholder="Dataset, Software, Documentation">
+                </div>
+                <div>
+                    <label>Identifier (DOI / UUID)</label>
+                    <input type="text" id="identifier" placeholder="10.5281/zenodo.999999">
+                </div>
+                <div>
+                    <label>License (SPDX)</label>
+                    <input type="text" id="license" placeholder="CC-BY-4.0">
+                </div>
+                <div>
+                    <label>Version</label>
+                    <input type="text" id="version" placeholder="1.0.0">
+                </div>
+                <div class="full-width">
+                    <label>Description</label>
+                    <textarea id="description" rows="2"></textarea>
+                </div>
+            </div>
+        </details>
+
+        <details open>
+            <summary>2. Keywords & People</summary>
+            <div class="form-grid">
+                <div class="full-width">
+                    <label>Keywords (comma-separated)</label>
+                    <input type="text" id="keywords" placeholder="climate, hydrology, open-data">
+                </div>
+            </div>
+            <div class="people-section">
+                <label>Authors & Contributors</label>
+                <div id="peopleContainer"></div>
+                <button type="button" class="btn btn-sec" id="addPersonButton">+ Add Person</button>
+            </div>
+        </details>
+
+        <div class="action-buttons">
+            <button type="button" class="btn btn-sec" id="generateSQLButton">Preview Conflict-Free SQL</button>
+            <button type="button" class="btn btn-gh" id="submitViaWebPRButton">1-Click GitHub Web PR (No Token)</button>
+            <button type="button" class="btn" id="submitViaGitHubAPIButton">Auto-Commit & Open PR (With Token)</button>
+        </div>
+    </form>
+
+    <h3>Generated Migration File: <code id="fileNamePreview">submissions/pending.sql</code></h3>
+    <pre id="sqlOutput">-- Fill out the form and click "Preview Conflict-Free SQL" or a GitHub PR button.</pre>
+
+
+</body>
+</html>
+
