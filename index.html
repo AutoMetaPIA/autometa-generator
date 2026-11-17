@@ -68,33 +68,14 @@
             </div>
         </details>
 
-        <details open>
-            <summary>Machine learning model</summary>
-            <div class="form-grid">
-                <div>
-                    <label>Link to information about the model</label>
-                    <input type="text" class="ml_model_info_link" required placeholder="https://www.mlmodelinfo.com">
-                </div>
-                <div>
-                    <label>ML model category</label>
-                    <select class="p-role">
-                        <option value="author">author</option>
-                        <option value="contributor">contributor</option>
-                        <option value="maintainer">maintainer</option>
-                    </select>
-                </div>
-            </div>
-            <div class="add-section">
-                <label>Dataset</label>
-                <div id="datasetsContainer"></div>
-                <button type="button" class="btn btn-sec" id="addDatasetButton">+ Add Dataset</button>
-            </div>
 
-            <!-- <div class="add-section">
-                <label>Author</label>
-                <div id="peopleContainer"></div>
-                <button type="button" class="btn btn-sec" id="addPersonButton">+ Add Person</button>
-            </div> -->
+        <details open>
+            <summary>Machine learning models used in the software</summary>
+            <div class="add-section">
+                <label>Machine learning models</label>
+                <div id="mlmodelsContainer"></div>
+                <button type="button" class="btn btn-sec" id="addMlmodelButton">+ Add machine learning model</button>
+            </div>
         </details>
 
         <div class="action-buttons">

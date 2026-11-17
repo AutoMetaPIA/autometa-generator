@@ -25,6 +25,13 @@ function addPersonRow() {
         <button type="button" class="btn btn-del">X</button>
     `;
     document.getElementById('peopleContainer').appendChild(row);
+
+    // for index.html
+            //     <!-- <div class="add-section">
+            //     <label>Author</label>
+            //     <div id="peopleContainer"></div>
+            //     <button type="button" class="btn btn-sec" id="addPersonButton">+ Add Person</button>
+            // </div> -->
 }
 
 function addPublicationRow() {
@@ -84,6 +91,28 @@ function addDatasetRow() {
 }
 
 
+function addMlmodelSection(){
+    const row = document.createElement('div');
+    row.className = 'mlmodel-form-grid';
+    row.innerHTML = `
+            <div>
+                <label>Link to information about the model</label>
+                <input type="text" class="ml_model_info_link" required placeholder="https://www.mlmodelinfo.com">
+            </div>
+            <div>
+                <label>ML model category</label>
+                <select class="p-role">
+                    <option value="author">author</option>
+                    <option value="contributor">contributor</option>
+                    <option value="maintainer">maintainer</option>
+                </select>
+            </div>
+       
+    `;
+    document.getElementById('mlmodelsContainer').appendChild(row);
+}
+
+
 // document.getElementById('addPersonButton').addEventListener('click', addPersonRow);
 // document.getElementById('peopleContainer').addEventListener('click', event => {
 //     if (!(event.target instanceof Element)) return;
@@ -108,14 +137,21 @@ document.getElementById('reviewPublicationsContainer').addEventListener('click',
     if (removeButton) removeButton.closest('.publication-row').remove();
 });
 
-document.getElementById('addDatasetButton').addEventListener('click', addDatasetRow);
-document.getElementById('datasetsContainer').addEventListener('click', event => {
+// document.getElementById('addDatasetButton').addEventListener('click', addDatasetRow);
+// document.getElementById('datasetsContainer').addEventListener('click', event => {
+//     if (!(event.target instanceof Element)) return;
+
+//     const removeButton = event.target.closest('.btn-del');
+//     if (removeButton) removeButton.closest('.dataset-row').remove();
+// });
+
+document.getElementById('addMlmodelButton').addEventListener('click', addMlmodelSection);
+document.getElementById('mlmodelsContainer').addEventListener('click', event => {
     if (!(event.target instanceof Element)) return;
 
     const removeButton = event.target.closest('.btn-del');
-    if (removeButton) removeButton.closest('.dataset-row').remove();
+    if (removeButton) removeButton.closest('.mlmodel-row').remove();
 });
-
 
 document.getElementById('generateSQLButton').addEventListener('click', generateSQL);
 document.getElementById('submitViaWebPRButton').addEventListener('click', () => submitViaWebPR());
@@ -124,7 +160,8 @@ document.getElementById('submitViaGitHubAPIButton').addEventListener('click', ()
 // addPersonRow();
 addPublicationRow();
 addReviewPublicationRow();
-addDatasetRow();
+addMlmodelSection();
+// addDatasetRow();
 
 
 function sqlVal(v) {

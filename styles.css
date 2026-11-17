@@ -92,11 +92,23 @@ textarea {
     align-items: end;
 }
 
+
 .form-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 1rem;
     margin-top: 1rem;
+}
+
+.mlmodel-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 0.6rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    align-items: end;
 }
 
 .btn {
