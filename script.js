@@ -68,50 +68,99 @@ function addReviewPublicationRow() {
     document.getElementById('reviewPublicationsContainer').appendChild(row);
 }
 
-function addDatasetRow() {
+function addDatasetRow(datasetsContainer) {
     const row = document.createElement('div');
     row.className = 'dataset-row';
     row.innerHTML = `
-        <div>
-            <label>Dataset name</label>
-            <input type="text" class="journal_article_title" placeholder="My cool dataset">
+        <div class="dataset-fields">
+            <div>
+                <label>Dataset name</label>
+                <input type="text" class="dataset-name" placeholder="My cool dataset">
+            </div>
+            <div>
+                <label>Dataset URL</label>
+                <input type="url" class="dataset-url" placeholder="https://example.org/dataset">
+            </div>
+            <div>
+                <label>Data used for</label>
+                <select class="data-category">
+                    <option value="training-data">Training</option>
+                    <option value="testing-data">Testing</option>
+                    <option value="validation-data">Validating</option>
+                    <option value="evaluation-data">Evaluating</option>
+                    <option value="unsure-data">I don't know</option>
+                </select>
+            </div>
+            <div class="dataset-ethical-aspects">
+                <label>Ethical, legal, and/or social aspects of this dataset</label>
+                <input type="text" class="dataset-ethics" placeholder="Describe relevant considerations">
+            </div>
         </div>
         <div>
-            <label>Dataset URL</label>
-            <input type="text" class="url" placeholder="http://www.their-dataset.com">
-        </div> 
-        <button type="button" class="btn btn-del">X</button>        
-        <div >
-            <label>Ethical, legal, and/or social aspects of this dataset</label>
-            <input type="text" class="url" placeholder="This dataset has alleged copyright violations...">
+            <button type="button" class="btn btn-del remove-dataset-button">Remove dataset</button>
         </div>
-        
     `;
-    document.getElementById('datasetsContainer').appendChild(row);
+    datasetsContainer.appendChild(row);
 }
 
-
-function addMlmodelSection(){
+function addMlmodelSection() {
     const row = document.createElement('div');
-    row.className = 'mlmodel-form-grid';
+    row.className = 'mlmodel-row';
     row.innerHTML = `
+        <div class="mlmodel-form-grid">
+            <div>
+                <label>Name of the model</label>
+                <input type="text" class="ml-model-info-link" placeholder="My cool model">
+            </div>
             <div>
                 <label>Link to information about the model</label>
-                <input type="text" class="ml_model_info_link" required placeholder="https://www.mlmodelinfo.com">
+                <input type="text" class="ml-model-info-link" placeholder="https://example.org/model">
             </div>
             <div>
                 <label>ML model category</label>
-                <select class="p-role">
+                <select class="ml-model-category">
                     <option value="author">author</option>
                     <option value="contributor">contributor</option>
                     <option value="maintainer">maintainer</option>
                 </select>
             </div>
-       
+        </div>
+        <div class="model-datasets">
+            <label>Dataset(s) used by this model</label>
+            <div class="datasets-container"></div>
+            <div>
+                <button type="button" class="btn btn-sec add-dataset-button">+ Add Dataset</button>
+            </div>
+        </div>
+        <button type="button" class="btn btn-del remove-model-button">Remove ML model</button>
+        </div>
     `;
+
+    const datasetsContainer = row.querySelector('.datasets-container');
+    // addDatasetRow(datasetsContainer);
     document.getElementById('mlmodelsContainer').appendChild(row);
 }
 
+document.getElementById('addMlmodelButton').addEventListener('click', addMlmodelSection);
+document.getElementById('mlmodelsContainer').addEventListener('click', event => {
+    if (!(event.target instanceof Element)) return;
+
+    const addDatasetButton = event.target.closest('.add-dataset-button');
+    if (addDatasetButton) {
+        const modelRow = addDatasetButton.closest('.mlmodel-row');
+        addDatasetRow(modelRow.querySelector('.datasets-container'));
+        return;
+    }
+
+    const removeDatasetButton = event.target.closest('.remove-dataset-button');
+    if (removeDatasetButton) {
+        removeDatasetButton.closest('.dataset-row').remove();
+        return;
+    }
+
+    const removeModelButton = event.target.closest('.remove-model-button');
+    if (removeModelButton) removeModelButton.closest('.mlmodel-row').remove();
+});
 
 // document.getElementById('addPersonButton').addEventListener('click', addPersonRow);
 // document.getElementById('peopleContainer').addEventListener('click', event => {
@@ -137,31 +186,14 @@ document.getElementById('reviewPublicationsContainer').addEventListener('click',
     if (removeButton) removeButton.closest('.publication-row').remove();
 });
 
-// document.getElementById('addDatasetButton').addEventListener('click', addDatasetRow);
-// document.getElementById('datasetsContainer').addEventListener('click', event => {
-//     if (!(event.target instanceof Element)) return;
-
-//     const removeButton = event.target.closest('.btn-del');
-//     if (removeButton) removeButton.closest('.dataset-row').remove();
-// });
-
-document.getElementById('addMlmodelButton').addEventListener('click', addMlmodelSection);
-document.getElementById('mlmodelsContainer').addEventListener('click', event => {
-    if (!(event.target instanceof Element)) return;
-
-    const removeButton = event.target.closest('.btn-del');
-    if (removeButton) removeButton.closest('.mlmodel-row').remove();
-});
-
 document.getElementById('generateSQLButton').addEventListener('click', generateSQL);
 document.getElementById('submitViaWebPRButton').addEventListener('click', () => submitViaWebPR());
 document.getElementById('submitViaGitHubAPIButton').addEventListener('click', () => submitViaGitHubAPI());
 
 // addPersonRow();
-addPublicationRow();
-addReviewPublicationRow();
+// addPublicationRow();
+// addReviewPublicationRow();
 addMlmodelSection();
-// addDatasetRow();
 
 
 function sqlVal(v) {
@@ -174,17 +206,27 @@ function slugify(text) {
 }
 
 function generateSQL() {
-    const name = document.getElementById('name').value.trim();
-    const url = document.getElementById('url').value.trim();
-    if (!name || !url) { alert("Name and Primary URL are required."); return null; }
+    const software_name = document.getElementById('software_name').value.trim();
+    if (!software_name) { alert("Name is required."); return null; }
 
-    const category = document.getElementById('category').value.trim();
-    const identifier = document.getElementById('identifier').value.trim();
-    const license = document.getElementById('license').value.trim();
-    const version = document.getElementById('version').value.trim();
-    const description = document.getElementById('description').value.trim();
+    const software_website_link = document.getElementById('software_website_link').value.trim();
+    const d = document.getElementById('d').value.trim();
+    const journal_article_title = document.getElementById('journal_article_title').value.trim();
+    const journal_article_URI = document.getElementById('journal_article_URI').value.trim();
+    const ml_model_info_link = document.getElementById('ml_model_info_link').value.trim();
+    const ml_model_ethics = document.getElementById('ml_model_ethics').value.trim();
+    const co2_emmissions_tonnes = document.getElementById('co2_emmissions_tonnes').value.trim();
+    const dataset_name = document.getElementById('dataset_name').value.trim();
+    const dataset_url = document.getElementById('dataset_url').value.trim();
+    const dataset_ethics = document.getElementById('dataset_ethics').value.trim();
 
-    const datePrefix = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    // is accessible for free
+    // const d = document.getElementById('d').value.trim();
+    // ml model category
+    // const d = document.getElementById('d').value.trim();
+    
+
+    // const datePrefix = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const fileName = `submissions/${datePrefix}-${slugify(name)}.sql`;
     document.getElementById('fileNamePreview').textContent = fileName;
 
