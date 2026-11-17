@@ -1,10 +1,18 @@
 :root {
-    --primary: #1a56db;
-    --bg: #f8fafc;
-    --card: #ffffff;
-    --border: #cbd5e1;
+    --primary: #3564c9;
+    --bg: #c9daec50;
+    --details-card: #ffffff;
+    --details-card-border: #6986a8;
     --text: #1e293b;
-    --muted: #64748b;
+    --muted: #2d3541;
+    --github: #0c8d2f;
+    --delete: #dc2626;
+    --added-card: #dfe5eac1;
+    --added-card-border: #6986a8;
+    --added-model: var(--added-card);/*  #c4cdd7; */
+    --added-dataset: var(--details-card);
+    --codebackground: #000000;
+
 }
 
 body {
@@ -17,8 +25,8 @@ body {
 }
 
 details {
-    background: var(--card);
-    border: 1px solid var(--border);
+    background: var(--details-card);
+    border: 1px solid var(--details-card-border);
     border-radius: 6px;
     margin-bottom: 1rem;
     padding: 0.75rem 1.25rem;
@@ -53,7 +61,7 @@ select,
 textarea {
     width: 100%;
     padding: 0.5rem;
-    border: 1px solid var(--border);
+    border: 1px solid var(--details-card-border);
     border-radius: 4px;
     box-sizing: border-box;
 }
@@ -62,7 +70,8 @@ textarea {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr auto;
     gap: 0.5rem;
-    background: #f1f5f9;
+    background: var(--added-card);
+    /* border: 1px solid var(--added-card-border); */
     padding: 0.6rem;
     border-radius: 4px;
     margin-bottom: 0.5rem;
@@ -73,7 +82,7 @@ textarea {
     display: grid;
     grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1.5fr) auto;
     gap: 0.5rem;
-    background: #f1f5f9;
+    background: var(--added-card);
     padding: 0.6rem;
     border-radius: 4px;
     margin-bottom: 0.5rem;
@@ -91,11 +100,12 @@ textarea {
     grid-template-columns: minmax(0, 1fr) auto;
     /* grid-template-columns: 1fr 1fr auto;
     grid-template-rows: 1fr auto; */
-    gap: 0.5rem;
-    background: #f1f5f9;
-    padding: 0.6rem;
+    gap: 1rem;
+    background: var(--added-dataset);
+    padding: 1rem;
     border-radius: 4px;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    margin-left: 4rem;
     align-items: end;
 }
 
@@ -126,11 +136,11 @@ textarea {
 .mlmodel-row {
     display: grid;
     gap: 0.75rem;
-    background: #c4cdd7;
+    background: var(--added-model);
     border-width: 10mm;
     padding: 0.6rem;
     border-radius: 4px;
-    margin-bottom: 0.5rem;
+    margin-bottom: 2.5rem;
 }
 
 .model-datasets {
@@ -161,16 +171,16 @@ textarea {
 }
 
 .btn-del {
-    background: #dc2626;
+    background: var(--delete);
     padding: 0.5rem 0.7rem;
 }
 
 .btn-preview-sql {
-   background: #000000;
+   background: var(--codebackground);
 }
 
 .btn-github-pr {
-   background: #0FBF3E;
+   background: var(--github);
 }
 
 pre {
@@ -222,4 +232,8 @@ pre {
     height: 1rem;
     padding: 0;
     margin: 0;
+}
+
+.drop-down-menu {
+    background: var(--details-card);
 }

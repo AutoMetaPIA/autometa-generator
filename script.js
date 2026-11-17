@@ -40,7 +40,7 @@ function addPublicationRow() {
     row.innerHTML = `
         <div>
             <label>Title *</label>
-            <input type="text" class="journal_article_title" required placeholder="Publication title">
+            <input type="text" class="journal_article_title" placeholder="Publication title">
         </div>
         <div>
             <label>DOI</label>
@@ -48,9 +48,9 @@ function addPublicationRow() {
         </div>
         <div>
             <label>Publication type</label>
-            <select class="publication-type">
-                <option value="reference">Reference about the software</option>
-                <option value="review">Review of the software</option>
+            <select class="drop-down-menu publication-type">
+                <option id="publication_type" value="reference">Reference about the software</option>
+                <option id="publication_type" value="review">Review of the software</option>
             </select>
         </div>
         <button type="button" class="btn btn-del">X</button>
@@ -65,7 +65,7 @@ function addDatasetRow(datasetsContainer) {
         <div class="dataset-fields">
             <div>
                 <label>Dataset name</label>
-                <input type="text" class="dataset_name" required placeholder="My cool dataset">
+                <input type="text" class="dataset_name" placeholder="My cool dataset">
             </div>
             <div>
                 <label>Dataset URL</label>
@@ -73,12 +73,12 @@ function addDatasetRow(datasetsContainer) {
             </div>
             <div>
                 <label>Data used for</label>
-                <select class="data_category">
-                    <option value="training-data">Training</option>
-                    <option value="testing-data">Testing</option>
-                    <option value="validation-data">Validating</option>
-                    <option value="evaluation-data">Evaluating</option>
-                    <option value="unsure-data">I don't know</option>
+                <select class="drop-down-menu data_category">
+                    <option id="data_category" value="training-data">Training</option>
+                    <option id="data_category" value="testing-data">Testing</option>
+                    <option id="data_category" value="validation-data">Validating</option>
+                    <option id="data_category" value="evaluation-data">Evaluating</option>
+                    <option id="data_category" value="unsure-data">I don't know</option>
                 </select>
             </div>
             <div class="dataset-ethical-aspects">
@@ -108,11 +108,12 @@ function addMlmodelSection() {
             </div>
             <div>
                 <label>ML model category</label>
-                <select class="ml_model_category">
-                    <option value="">Select a category</option>
-                    <option value="author">author</option>
-                    <option value="contributor">contributor</option>
-                    <option value="maintainer">maintainer</option>
+                <select class="drop-down-menu ml_model_category">
+                    <option id="ml_model_category" value="">Select a category</option>
+                    <option id="ml_model_category" value="author">author</option>
+                    <option id="ml_model_category" value="contributor">contributor</option>
+                    <option id="ml_model_category" value="maintainer">maintainer</option>
+                    <option id="ml_model_category" value="unsure">I don't know</option>
                 </select>
             </div>
         </div>
@@ -168,7 +169,6 @@ document.getElementById('relatedPublicationsContainer').addEventListener('click'
 
 document.getElementById('generateSQLButton').addEventListener('click', generateSQL);
 document.getElementById('submitViaWebPRButton').addEventListener('click', () => submitViaWebPR());
-document.getElementById('submitViaGitHubAPIButton').addEventListener('click', () => submitViaGitHubAPI());
 
 // addPersonRow();
 addPublicationRow();
@@ -198,12 +198,25 @@ function generateSQL() {
     const isAccessibleFreely = document.getElementById('is_accessible_freely').checked ? 1 : 0;
     const softwareId = window.crypto.randomUUID();
 
-    const publications = [...document.querySelectorAll('#relatedPublicationsContainer .publication-row')].map(row => ({
-        id: window.crypto.randomUUID(),
-        title: row.querySelector('.journal_article_title').value.trim(),
-        uri: row.querySelector('.journal_article_URI').value.trim(),
-        type: row.querySelector('.publication-type').value
-    }));
+    const publicationRows = [...document.querySelectorAll('#relatedPublicationsContainerpreview .publication-row')];
+    const incompletePublicationRow = publicationRows.find(row =>
+        !row.querySelector('.journal_article_title').value.trim() &&
+        row.querySelector('.journal_article_URI').value.trim()
+    );
+    if (incompletePublicationRow) {
+        alert('Enter a title for each publication that has other information.');
+        incompletePublicationRow.querySelector('.journal_article_title').focus();
+        return null;
+    }
+
+    const publications = publicationRows
+        .map(row => ({
+            id: window.crypto.randomUUID(),
+            title: row.querySelector('.journal_article_title').value.trim(),
+            uri: row.querySelector('.journal_article_URI').value.trim(),
+            type: row.querySelector('.publication-type').value
+        }))
+        .filter(publication => publication.title || publication.uri);
 
     const models = [];
     for (const row of document.querySelectorAll('#mlmodelsContainer .mlmodel-row')) {
