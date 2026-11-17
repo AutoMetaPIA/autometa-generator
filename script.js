@@ -44,7 +44,7 @@ function addPublicationRow() {
         </div>
         <div>
             <label>DOI</label>
-            <input type="text" class="doi" placeholder="10.0000/example">
+            <input type="text" class="journal_article_URI" placeholder="10.0000/example">
         </div>
         <div>
             <label>Publication type</label>
@@ -65,15 +65,15 @@ function addDatasetRow(datasetsContainer) {
         <div class="dataset-fields">
             <div>
                 <label>Dataset name</label>
-                <input type="text" class="dataset-name" placeholder="My cool dataset">
+                <input type="text" class="dataset_name" required placeholder="My cool dataset">
             </div>
             <div>
                 <label>Dataset URL</label>
-                <input type="url" class="dataset-url" placeholder="https://example.org/dataset">
+                <input type="url" class="dataset_url" placeholder="https://example.org/dataset">
             </div>
             <div>
                 <label>Data used for</label>
-                <select class="data-category">
+                <select class="data_category">
                     <option value="training-data">Training</option>
                     <option value="testing-data">Testing</option>
                     <option value="validation-data">Validating</option>
@@ -83,7 +83,7 @@ function addDatasetRow(datasetsContainer) {
             </div>
             <div class="dataset-ethical-aspects">
                 <label>Ethical, legal, and/or social aspects of this dataset</label>
-                <input type="text" class="dataset-ethics" placeholder="Describe relevant considerations">
+                <input type="text" class="dataset_ethics" placeholder="Describe relevant considerations">
             </div>
         </div>
         <div>
@@ -100,15 +100,16 @@ function addMlmodelSection() {
         <div class="mlmodel-form-grid">
             <div>
                 <label>Name of the model</label>
-                <input type="text" class="ml-model-info-link" placeholder="My cool model">
+                <input type="text" class="ml_model_name" placeholder="My cool model">
             </div>
             <div>
                 <label>Link to information about the model</label>
-                <input type="text" class="ml-model-info-link" placeholder="https://example.org/model">
+                <input type="url" class="ml_model_info_link" placeholder="https://example.org/model">
             </div>
             <div>
                 <label>ML model category</label>
-                <select class="ml-model-category">
+                <select class="ml_model_category">
+                    <option value="">Select a category</option>
                     <option value="author">author</option>
                     <option value="contributor">contributor</option>
                     <option value="maintainer">maintainer</option>
@@ -123,11 +124,8 @@ function addMlmodelSection() {
             </div>
         </div>
         <button type="button" class="btn btn-del remove-model-button">Remove ML model</button>
-        </div>
     `;
 
-    const datasetsContainer = row.querySelector('.datasets-container');
-    // addDatasetRow(datasetsContainer);
     document.getElementById('mlmodelsContainer').appendChild(row);
 }
 
@@ -173,13 +171,13 @@ document.getElementById('submitViaWebPRButton').addEventListener('click', () => 
 document.getElementById('submitViaGitHubAPIButton').addEventListener('click', () => submitViaGitHubAPI());
 
 // addPersonRow();
-addPublicationsRow();
+addPublicationRow();
 addMlmodelSection();
 
 
 function sqlVal(v) {
-    if (!v || !v.trim()) return 'NULL';
-    return `'${v.trim().replace(/'/g, "''")}'`;
+    if (v === null || v === undefined || !String(v).trim()) return 'NULL';
+    return `'${String(v).trim().replace(/'/g, "''")}'`;
 }
 
 function slugify(text) {
@@ -187,92 +185,96 @@ function slugify(text) {
 }
 
 function generateSQL() {
-    const software_name = document.getElementById('software_name').value.trim();
-    if (!software_name) { alert("Name is required."); return null; }
+    const form = document.getElementById('metaForm');
+    if (!form.reportValidity()) return null;
 
-    const software_website_link = document.getElementById('software_website_link').value.trim();
-    const d = document.getElementById('d').value.trim();
-    const journal_article_title = document.getElementById('journal_article_title').value.trim();
-    const journal_article_URI = document.getElementById('journal_article_URI').value.trim();
-    const ml_model_info_link = document.getElementById('ml_model_info_link').value.trim();
-    const ml_model_ethics = document.getElementById('ml_model_ethics').value.trim();
-    const co2_emmissions_tonnes = document.getElementById('co2_emmissions_tonnes').value.trim();
-    const dataset_name = document.getElementById('dataset_name').value.trim();
-    const dataset_url = document.getElementById('dataset_url').value.trim();
-    const dataset_ethics = document.getElementById('dataset_ethics').value.trim();
-
-    // is accessible for free
-    // const d = document.getElementById('d').value.trim();
-    // ml model category
-    // const d = document.getElementById('d').value.trim();
-    
-
-    // const datePrefix = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-    const fileName = `submissions/${datePrefix}-${slugify(name)}.sql`;
-    document.getElementById('fileNamePreview').textContent = fileName;
-
-    let lines = [
-        `-- Migration generated on ${new Date().toISOString()}`,
-        `BEGIN TRANSACTION;`,
-        ``
-    ];
-
-    // 1. Category
-    if (category) {
-        lines.push(`INSERT OR IGNORE INTO categories (name) VALUES (${sqlVal(category)});`);
+    if (typeof window.crypto?.randomUUID !== 'function') {
+        alert('Secure ID generation is unavailable. Open this site in a current browser over HTTPS or localhost.');
+        return null;
     }
 
-    // 2. Resource (Upsert / Ignore duplicate URL)
-    const catExpr = category ? `(SELECT id FROM categories WHERE name = ${sqlVal(category)})` : 'NULL';
-    lines.push(
-        `INSERT INTO resources (name, url, identifier, description, version, license_spdx, category_id)`,
-        `VALUES (${sqlVal(name)}, ${sqlVal(url)}, ${sqlVal(identifier)}, ${sqlVal(description)}, ${sqlVal(version)}, ${sqlVal(license)}, ${catExpr})`,
-        `ON CONFLICT(url) DO UPDATE SET name=excluded.name, description=excluded.description, version=excluded.version, license_spdx=excluded.license_spdx;`,
-        ``
-    );
+    const softwareName = document.getElementById('software_name').value.trim();
+    const softwareWebsite = document.getElementById('software_website_link').value.trim();
+    const isAccessibleFreely = document.getElementById('is_accessible_freely').checked ? 1 : 0;
+    const softwareId = window.crypto.randomUUID();
 
-    // 3. People & Roles (Subquery lookup avoids ID collisions across PRs)
-    document.querySelectorAll('.person-row').forEach(row => {
-        const given = row.querySelector('.p-given').value.trim();
-        const family = row.querySelector('.p-family').value.trim();
-        const role = row.querySelector('.p-role').value;
-        const orcid = row.querySelector('.p-orcid').value.trim();
+    const publications = [...document.querySelectorAll('#relatedPublicationsContainer .publication-row')].map(row => ({
+        id: window.crypto.randomUUID(),
+        title: row.querySelector('.journal_article_title').value.trim(),
+        uri: row.querySelector('.journal_article_URI').value.trim(),
+        type: row.querySelector('.publication-type').value
+    }));
 
-        if (given && family) {
-            if (orcid) {
-                lines.push(`INSERT OR IGNORE INTO people (given_name, family_name, orcid) VALUES (${sqlVal(given)}, ${sqlVal(family)}, ${sqlVal(orcid)});`);
-                lines.push(`INSERT INTO resource_roles (resource_id, person_id, role_name) VALUES ((SELECT id FROM resources WHERE url = ${sqlVal(url)}), (SELECT id FROM people WHERE orcid = ${sqlVal(orcid)}), ${sqlVal(role)});`);
-            } else {
-                lines.push(`INSERT INTO people (given_name, family_name, orcid) SELECT ${sqlVal(given)}, ${sqlVal(family)}, NULL WHERE NOT EXISTS (SELECT 1 FROM people WHERE given_name = ${sqlVal(given)} AND family_name = ${sqlVal(family)});`);
-                lines.push(`INSERT INTO resource_roles (resource_id, person_id, role_name) VALUES ((SELECT id FROM resources WHERE url = ${sqlVal(url)}), (SELECT id FROM people WHERE given_name = ${sqlVal(given)} AND family_name = ${sqlVal(family)} LIMIT 1), ${sqlVal(role)});`);
-            }
+    const models = [];
+    for (const row of document.querySelectorAll('#mlmodelsContainer .mlmodel-row')) {
+        const name = row.querySelector('.ml_model_name').value.trim();
+        const infoLink = row.querySelector('.ml_model_info_link').value.trim();
+        const category = row.querySelector('.ml_model_category').value;
+        const datasets = [...row.querySelectorAll('.dataset-row')].map(datasetRow => ({
+            id: window.crypto.randomUUID(),
+            name: datasetRow.querySelector('.dataset_name').value.trim(),
+            url: datasetRow.querySelector('.dataset_url').value.trim(),
+            category: datasetRow.querySelector('.data_category').value,
+            ethics: datasetRow.querySelector('.dataset_ethics').value.trim()
+        }));
+
+        const hasModelData = name || infoLink || category || datasets.length > 0;
+        if (!hasModelData) continue;
+
+        if (!name) {
+            alert('Enter a name for each machine learning model that has data.');
+            row.querySelector('.ml_model_name').focus();
+            return null;
         }
+
+        models.push({
+            id: window.crypto.randomUUID(),
+            name,
+            infoLink,
+            category,
+            datasets
+        });
+    }
+
+    const datePrefix = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const fileName = `submissions/${datePrefix}-${slugify(softwareName)}.sql`;
+    document.getElementById('fileNamePreview').textContent = fileName;
+
+    const lines = [
+        `-- Migration generated on ${new Date().toISOString()}`,
+        `PRAGMA foreign_keys = ON;`,
+        `BEGIN TRANSACTION;`,
+        ``,
+        `INSERT INTO softwares (software_id, software_name, software_website_link, is_accessible_freely)`,
+        `VALUES (${sqlVal(softwareId)}, ${sqlVal(softwareName)}, ${sqlVal(softwareWebsite)}, ${isAccessibleFreely});`
+    ];
+
+    publications.forEach(publication => {
+        lines.push(
+            ``,
+            `INSERT INTO publications (publication_id, software_id, journal_article_title, journal_article_URI, publication_type)`,
+            `VALUES (${sqlVal(publication.id)}, ${sqlVal(softwareId)}, ${sqlVal(publication.title)}, ${sqlVal(publication.uri)}, ${sqlVal(publication.type)});`
+        );
     });
 
+    models.forEach(model => {
+        lines.push(
+            ``,
+            `INSERT INTO mlmodels (ml_model_id, software_id, ml_model_name, ml_model_info_link, ml_model_category)`,
+            `VALUES (${sqlVal(model.id)}, ${sqlVal(softwareId)}, ${sqlVal(model.name)}, ${sqlVal(model.infoLink)}, ${sqlVal(model.category)});`
+        );
 
-// . Publication
-    document.querySelectorAll('.publication-row').forEach(row => {
-        const given = row.querySelector('.journal_article_title').value.trim();
-        const orcid = row.querySelector('.doi').value.trim();
-
-        if (given && family) {
-            if (doi) {
-                lines.push(`INSERT OR IGNORE INTO publications (title, doi) VALUES (${sqlVal(title)}, ${sqlVal(doi)});`);
-            } else {
-                lines.push(`INSERT INTO publications (title, doi) SELECT ${sqlVal(title)}, NULL WHERE NOT EXISTS (SELECT 1 FROM publications WHERE given_name = ${sqlVal(title)} );`);
-            }
-        }
-    });
-
-    // 4. Keywords
-    const kws = [...new Set(document.getElementById('keywords').value.split(',').map(k => k.trim().toLowerCase()).filter(Boolean))];
-    kws.forEach(kw => {
-        lines.push(`INSERT OR IGNORE INTO keywords (term) VALUES (${sqlVal(kw)});`);
-        lines.push(`INSERT OR IGNORE INTO resource_keywords (resource_id, keyword_id) VALUES ((SELECT id FROM resources WHERE url = ${sqlVal(url)}), (SELECT id FROM keywords WHERE term = ${sqlVal(kw)}));`);
+        model.datasets.forEach(dataset => {
+            lines.push(
+                ``,
+                `INSERT INTO datasets (dataset_id, ml_model_id, dataset_name, dataset_url, data_category, dataset_ethics)`,
+                `VALUES (${sqlVal(dataset.id)}, ${sqlVal(model.id)}, ${sqlVal(dataset.name)}, ${sqlVal(dataset.url)}, ${sqlVal(dataset.category)}, ${sqlVal(dataset.ethics)});`
+            );
+        });
     });
 
     lines.push(``, `COMMIT;`);
     const sqlText = lines.join('\n');
     document.getElementById('sqlOutput').textContent = sqlText;
-    return { fileName, sqlText, name };
+    return { fileName, sqlText, name: softwareName };
 }

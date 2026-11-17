@@ -165,6 +165,14 @@ textarea {
     padding: 0.5rem 0.7rem;
 }
 
+.btn-preview-sql {
+   background: #000000;
+}
+
+.btn-github-pr {
+   background: #0FBF3E;
+}
+
 pre {
     background: #0f172a;
     color: #e2e8f0;

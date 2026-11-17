@@ -7,35 +7,26 @@
         http-equiv="Content-Security-Policy"
         content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; form-action 'self'"
     >
-    <title>Collaborative AutoMeta v0.0 Relational Generator</title>
+    <title>AutoMeta Generator</title>
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
 </head>
 <body>
 
-    <h1>Collaborative Relational Metadata Generator</h1>
+    <h1>AutoMeta Generator</h1>
     <p class="muted-copy">
-        Generates conflict-free SQL migration scripts and opens a GitHub Pull Request for review.
+        For collaboratively generating metadata about knowledge-synthesis software.
+
     </p>
 
-    <!-- Target Repository Config -->
-    <div class="gh-config">
-        <strong>Target GitHub Repository</strong>
-        <div class="form-grid repo-grid">
-            <div>
-                <label>GitHub Owner / Org</label>
-                <input type="text" id="ghOwner" value="AutoMetaPIA">
-            </div>
-            <div>
-                <label>Repository Name</label>
-                <input type="text" id="ghRepo" value="auto-meta-generator">
-            </div>
-            <!-- <div>
-                <label>GitHub Personal Access Token (Optional)</label>
-                <input type="password" id="ghToken" placeholder="Leave blank to use browser web PR">
-            </div> -->
-        </div>
-    </div>
+    <h3>What this page does</h3>
+    <ul class="muted-copy">
+        <li>Takes input metadata,</li>
+        <li>Generates SQL migration scripts, and</li>
+        <li>Opens a GitHub Pull Request for review to add to the database.</li>
+    </ul>
+
+
 
     <form id="metaForm">
         <details open>
@@ -59,7 +50,7 @@
             <div class="add-section">
                 <label>Related publication(s)</label>
                 <div id="relatedPublicationsContainer"></div>
-                <button type="button" class="btn btn-sec" id="addRelatedPublicationButton">+ Add Publication</button>
+                <button type="button" class="btn btn-sec" id="addRelatedPublicationButton">+ Add publication</button>
             </div>
         </details>
 
@@ -70,21 +61,46 @@
                 <!-- <label>Machine learning models</label> -->
                 <div id="mlmodelsContainer"></div>
                 <div>
-                    <button type="button" class="btn btn-sec" id="addMlmodelButton">+ Add ML model</button>
+                    <button type="button" class="btn btn-sec" id="addMlmodelButton">+ Add machine learning model</button>
                 </div>
                 
             </div>
         </details>
 
+        <!-- Target Repository Config -->
+        <div class="form-grid">
+            <details closed>
+                <summary><strong>Target GitHub Repository</strong></summary>
+                <p class="muted-copy">
+                    Don't edit this section unless you want to send the Pull Request to a different GitHub repository.
+                </p>
+                <div class="form-grid repo-grid">
+                    <div>
+                        <label>GitHub Owner / Org</label>
+                        <input type="text" id="ghOwner" value="AutoMetaPIA">
+                    </div>
+                    <div>
+                        <label>Repository Name</label>
+                        <input type="text" id="ghRepo" value="auto-meta-generator">
+                    </div>
+                    <!-- <div>
+                        <label>GitHub Personal Access Token (Optional)</label>
+                        <input type="password" id="ghToken" placeholder="Leave blank to use browser web PR">
+                    </div> -->
+                </div>
+            </details>
+        </div>
+
         <div class="action-buttons">
-            <button type="button" class="btn btn-sec" id="generateSQLButton">Preview Conflict-Free SQL</button>
-            <button type="button" class="btn btn-gh" id="submitViaWebPRButton">1-Click GitHub Web PR (No Token)</button>
-            <button type="button" class="btn" id="submitViaGitHubAPIButton">Auto-Commit & Open PR (With Token)</button>
+            <button type="button" class="btn btn-sec btn-preview-sql" id="generateSQLButton">Preview SQL</button>
+            <button type="button" class="btn btn-sec btn-github-pr" id="submitViaWebPRButton">Incorporate into database (open GitHub Pull Request)</button>
+            <!-- <button type="button" class="btn" id="submitViaGitHubAPIButton">Auto-Commit & Open PR (With Token)</button> -->
         </div>
     </form>
 
+
     <h3>Generated Migration File: <code id="fileNamePreview">submissions/pending.sql</code></h3>
-    <pre id="sqlOutput">-- Fill out the form and click "Preview Conflict-Free SQL" or a GitHub PR button.</pre>
+    <pre id="sqlOutput">-- Fill out the form and click "Preview SQL" to see what will be sent to GitHub.</pre>
 
 
 </body>
