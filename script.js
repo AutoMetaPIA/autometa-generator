@@ -40,32 +40,22 @@ function addPublicationRow() {
     row.innerHTML = `
         <div>
             <label>Title *</label>
-            <input type="text" class="journal_article_title" required placeholder="My cool software">
+            <input type="text" class="journal_article_title" required placeholder="Publication title">
         </div>
         <div>
             <label>DOI</label>
-            <input type="text" class="doi" placeholder="https://doi.org/10000/10000">
+            <input type="text" class="doi" placeholder="10.0000/example">
+        </div>
+        <div>
+            <label>Publication type</label>
+            <select class="publication-type">
+                <option value="reference">Reference about the software</option>
+                <option value="review">Review of the software</option>
+            </select>
         </div>
         <button type="button" class="btn btn-del">X</button>
     `;
-    document.getElementById('publicationsContainer').appendChild(row);
-}
-
-function addReviewPublicationRow() {
-    const row = document.createElement('div');
-    row.className = 'publication-row';
-    row.innerHTML = `
-        <div>
-            <label>Title *</label>
-            <input type="text" class="journal_article_title" required placeholder="My cool software">
-        </div>
-        <div>
-            <label>DOI</label>
-            <input type="text" class="doi" placeholder="https://doi.org/10000/10000">
-        </div>
-        <button type="button" class="btn btn-del">X</button>
-    `;
-    document.getElementById('reviewPublicationsContainer').appendChild(row);
+    document.getElementById('relatedPublicationsContainer').appendChild(row);
 }
 
 function addDatasetRow(datasetsContainer) {
@@ -170,16 +160,8 @@ document.getElementById('mlmodelsContainer').addEventListener('click', event => 
 //     if (removeButton) removeButton.closest('.person-row').remove();
 // });
 
-document.getElementById('addPublicationButton').addEventListener('click', addPublicationRow);
-document.getElementById('publicationsContainer').addEventListener('click', event => {
-    if (!(event.target instanceof Element)) return;
-
-    const removeButton = event.target.closest('.btn-del');
-    if (removeButton) removeButton.closest('.publication-row').remove();
-});
-
-document.getElementById('addReviewPublicationButton').addEventListener('click', addReviewPublicationRow);
-document.getElementById('reviewPublicationsContainer').addEventListener('click', event => {
+document.getElementById('addRelatedPublicationButton').addEventListener('click', addPublicationRow);
+document.getElementById('relatedPublicationsContainer').addEventListener('click', event => {
     if (!(event.target instanceof Element)) return;
 
     const removeButton = event.target.closest('.btn-del');
@@ -191,8 +173,7 @@ document.getElementById('submitViaWebPRButton').addEventListener('click', () => 
 document.getElementById('submitViaGitHubAPIButton').addEventListener('click', () => submitViaGitHubAPI());
 
 // addPersonRow();
-// addPublicationRow();
-// addReviewPublicationRow();
+addPublicationsRow();
 addMlmodelSection();
 
 

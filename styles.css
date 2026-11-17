@@ -71,13 +71,19 @@ textarea {
 
 .publication-row {
     display: grid;
-    grid-template-columns: 1fr 1fr auto;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1.5fr) auto;
     gap: 0.5rem;
     background: #f1f5f9;
     padding: 0.6rem;
     border-radius: 4px;
     margin-bottom: 0.5rem;
     align-items: end;
+}
+
+@media (max-width: 640px) {
+    .publication-row {
+        grid-template-columns: 1fr;
+    }
 }
 
 .dataset-row {
