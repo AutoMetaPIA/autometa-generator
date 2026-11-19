@@ -67,30 +67,6 @@
             </div>
         </details>
 
-        <!-- Target Repository Config -->
-        <div class="form-grid">
-            <details closed>
-                <summary><strong>Target GitHub Repository</strong></summary>
-                <p class="muted-copy">
-                    Don't edit this section unless you want to send the Pull Request to a different GitHub repository.
-                </p>
-                <div class="form-grid repo-grid">
-                    <div>
-                        <label>GitHub Owner / Org</label>
-                        <input type="text" id="ghOwner" value="AutoMetaPIA">
-                    </div>
-                    <div>
-                        <label>Repository Name</label>
-                        <input type="text" id="ghRepo" value="autometa-collection">
-                    </div>
-                    <!-- <div>
-                        <label>GitHub Personal Access Token (Optional)</label>
-                        <input type="password" id="ghToken" placeholder="Leave blank to use browser web PR">
-                    </div> -->
-                </div>
-            </details>
-        </div>
-
         <div class="action-buttons">
             <button type="button" class="btn btn-sec btn-preview-sql" id="generateSQLButton">Preview SQL</button>
             <button type="button" class="btn btn-sec btn-github-pr" id="submitViaWebPRButton">Incorporate into database (open GitHub Pull Request)</button>
