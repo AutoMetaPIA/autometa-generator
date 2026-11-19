@@ -5,7 +5,7 @@
     --details-card-border: #6986a8;
     --text: #1e293b;
     --muted: #2d3541;
-    --github: #0c8d2f;
+    --green: #80cc94;
     --delete: #dc2626;
     --added-card: #dfe5eac1;
     --added-card-border: #6986a8;
@@ -158,10 +158,6 @@ textarea {
     cursor: pointer;
 }
 
-.btn-gh {
-    background: #24292f;
-}
-
 .btn-gh:hover {
     background: #000000;
 }
@@ -176,11 +172,17 @@ textarea {
 }
 
 .btn-preview-json {
-   background: var(--codebackground);
+   background: var(--green);
 }
 
-.btn-github-pr {
-   background: var(--github);
+.btn-copy-download-json {
+    background: var(--green);
+}
+
+
+.btn-clear-form {
+    background: var(--delete);
+    padding: 0.5rem 0.7rem;
 }
 
 pre {

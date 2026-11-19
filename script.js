@@ -205,6 +205,19 @@ document.getElementById('fillExampleData').addEventListener('change', event => {
 
 /////////////////////////////// Generate json
 
+function clearForm() {
+    document.getElementById('metaForm').reset();
+    document.getElementById('relatedPublicationsContainer').replaceChildren();
+    document.getElementById('mlmodelsContainer').replaceChildren();
+    document.getElementById('jsonOutput').textContent =
+        'Fill out the form and click "Preview JSON" to see the generated metadata.';
+    document.getElementById('jsonStatus').textContent = 'Form cleared.';
+}
+
+document.querySelectorAll('.btn-clear-form').forEach(button => {
+    button.addEventListener('click', clearForm);
+});
+
 document.getElementById('addRelatedPublicationButton').addEventListener('click', addPublicationRow);
 document.getElementById('relatedPublicationsContainer').addEventListener('click', event => {
     if (!(event.target instanceof Element)) return;
