@@ -151,6 +151,50 @@ document.getElementById('mlmodelsContainer').addEventListener('click', event => 
     if (removeModelButton) removeModelButton.closest('.mlmodel-row').remove();
 });
 
+document.getElementById('fillExampleData').addEventListener('change', event => {
+    const checkbox = event.currentTarget;
+    if (!checkbox.checked) return;
+
+    const hasExistingData = [...document.querySelectorAll(
+        '#software_name, #software_website_link, #relatedPublicationsContainer input, #mlmodelsContainer input'
+    )].some(input => input.value.trim()) ||
+        document.getElementById('is_accessible_freely').checked;
+
+    if (hasExistingData && !window.confirm('Replace the current form data with example data?')) {
+        checkbox.checked = false;
+        return;
+    }
+
+    document.getElementById('software_name').value = 'Example Knowledge Synthesis Software';
+    document.getElementById('software_website_link').value = 'https://example.org/software';
+    document.getElementById('is_accessible_freely').checked = true;
+
+    const publicationsContainer = document.getElementById('relatedPublicationsContainer');
+    publicationsContainer.replaceChildren();
+    addPublicationRow();
+    const publicationRow = publicationsContainer.querySelector('.publication-row');
+    publicationRow.querySelector('.journal_article_title').value = 'Example software publication';
+    publicationRow.querySelector('.journal_article_URI').value = '10.0000/example.1';
+
+    const modelsContainer = document.getElementById('mlmodelsContainer');
+    modelsContainer.replaceChildren();
+    addMlmodelSection();
+    const modelRow = modelsContainer.querySelector('.mlmodel-row');
+    modelRow.querySelector('.ml_model_name').value = 'Example machine learning model';
+    modelRow.querySelector('.ml_model_info_link').value = 'https://example.org/model';
+    modelRow.querySelector('.ml_model_category').value = 'contributor';
+
+    const datasetsContainer = modelRow.querySelector('.datasets-container');
+    addDatasetRow(datasetsContainer);
+    const datasetRow = datasetsContainer.querySelector('.dataset-row');
+    datasetRow.querySelector('.dataset_name').value = 'Example training dataset';
+    datasetRow.querySelector('.dataset_url').value = 'https://example.org/dataset';
+    datasetRow.querySelector('.data_category').value = 'training-data';
+    datasetRow.querySelector('.dataset_ethics').value = 'Synthetic example data; no personal information.';
+
+    document.getElementById('jsonStatus').textContent = 'Example data loaded.';
+});
+
 // document.getElementById('addPersonButton').addEventListener('click', addPersonRow);
 // document.getElementById('peopleContainer').addEventListener('click', event => {
 //     if (!(event.target instanceof Element)) return;
@@ -158,6 +202,8 @@ document.getElementById('mlmodelsContainer').addEventListener('click', event => 
 //     const removeButton = event.target.closest('.btn-del');
 //     if (removeButton) removeButton.closest('.person-row').remove();
 // });
+
+/////////////////////////////// Generate json
 
 document.getElementById('addRelatedPublicationButton').addEventListener('click', addPublicationRow);
 document.getElementById('relatedPublicationsContainer').addEventListener('click', event => {
@@ -167,38 +213,63 @@ document.getElementById('relatedPublicationsContainer').addEventListener('click'
     if (removeButton) removeButton.closest('.publication-row').remove();
 });
 
-document.getElementById('generateSQLButton').addEventListener('click', generateSQL);
-document.getElementById('submitViaWebPRButton').addEventListener('click', () => submitViaWebPR());
+document.getElementById('generateJSONButton').addEventListener('click', generateJSON);
+document.getElementById('copyJSONButton').addEventListener('click', async () => {
+    const generated = generateJSON();
+    if (!generated) return;
 
-// addPersonRow();
-addPublicationRow();
-addMlmodelSection();
+    if (!navigator.clipboard?.writeText) {
+        document.getElementById('jsonStatus').textContent =
+            'Clipboard access is unavailable. Select the JSON above and copy it manually.';
+        return;
+    }
 
+    try {
+        await navigator.clipboard.writeText(generated.jsonText);
+        document.getElementById('jsonStatus').textContent = 'JSON copied to the clipboard.';
+    } catch (error) {
+        const detail = error instanceof Error ? ` ${error.message}` : '';
+        document.getElementById('jsonStatus').textContent = `Could not copy JSON.${detail}`;
+    }
+});
+document.getElementById('downloadJSONButton').addEventListener('click', () => {
+    const generated = generateJSON();
+    if (!generated) return;
 
-function sqlVal(v) {
-    if (v === null || v === undefined || !String(v).trim()) return 'NULL';
-    return `'${String(v).trim().replace(/'/g, "''")}'`;
-}
+    const blob = new Blob([generated.jsonText], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = generated.fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+    document.getElementById('jsonStatus').textContent = `Downloaded ${generated.fileName}.`;
+});
 
-function slugify(text) {
-    return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'resource';
-}
-
-function generateSQL() {
+function generateJSON() {
     const form = document.getElementById('metaForm');
     if (!form.reportValidity()) return null;
 
-    if (typeof window.crypto?.randomUUID !== 'function') {
-        alert('Secure ID generation is unavailable. Open this site in a current browser over HTTPS or localhost.');
+    const status = document.getElementById('jsonStatus');
+    if (typeof window.crypto?.randomUUID !== 'function' && typeof window.crypto?.getRandomValues !== 'function') {
+        status.textContent = 'Secure ID generation is unavailable in this browser.';
         return null;
     }
+    const createId = () => {
+        if (typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID();
+
+        const bytes = window.crypto.getRandomValues(new Uint8Array(16));
+        bytes[6] = (bytes[6] & 0x0f) | 0x40;
+        bytes[8] = (bytes[8] & 0x3f) | 0x80;
+        const hex = [...bytes].map(byte => byte.toString(16).padStart(2, '0')).join('');
+        return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+    };
 
     const softwareName = document.getElementById('software_name').value.trim();
     const softwareWebsite = document.getElementById('software_website_link').value.trim();
-    const isAccessibleFreely = document.getElementById('is_accessible_freely').checked ? 1 : 0;
-    const softwareId = window.crypto.randomUUID();
-
-    const publicationRows = [...document.querySelectorAll('#relatedPublicationsContainerpreview .publication-row')];
+    const publicationRows = [...document.querySelectorAll('#relatedPublicationsContainer .publication-row')];
     const incompletePublicationRow = publicationRows.find(row =>
         !row.querySelector('.journal_article_title').value.trim() &&
         row.querySelector('.journal_article_URI').value.trim()
@@ -209,27 +280,40 @@ function generateSQL() {
         return null;
     }
 
-    const publications = publicationRows
+    const publicationData = publicationRows
         .map(row => ({
-            id: window.crypto.randomUUID(),
             title: row.querySelector('.journal_article_title').value.trim(),
             uri: row.querySelector('.journal_article_URI').value.trim(),
             type: row.querySelector('.publication-type').value
         }))
         .filter(publication => publication.title || publication.uri);
 
-    const models = [];
+    const modelData = [];
     for (const row of document.querySelectorAll('#mlmodelsContainer .mlmodel-row')) {
         const name = row.querySelector('.ml_model_name').value.trim();
         const infoLink = row.querySelector('.ml_model_info_link').value.trim();
         const category = row.querySelector('.ml_model_category').value;
-        const datasets = [...row.querySelectorAll('.dataset-row')].map(datasetRow => ({
-            id: window.crypto.randomUUID(),
-            name: datasetRow.querySelector('.dataset_name').value.trim(),
-            url: datasetRow.querySelector('.dataset_url').value.trim(),
-            category: datasetRow.querySelector('.data_category').value,
-            ethics: datasetRow.querySelector('.dataset_ethics').value.trim()
-        }));
+        const datasets = [];
+
+        for (const datasetRow of row.querySelectorAll('.dataset-row')) {
+            const datasetName = datasetRow.querySelector('.dataset_name').value.trim();
+            const url = datasetRow.querySelector('.dataset_url').value.trim();
+            const ethics = datasetRow.querySelector('.dataset_ethics').value.trim();
+            if (!datasetName && !url && !ethics) continue;
+
+            if (!datasetName) {
+                alert('Enter a name for each dataset that has other information.');
+                datasetRow.querySelector('.dataset_name').focus();
+                return null;
+            }
+
+            datasets.push({
+                name: datasetName,
+                url,
+                category: datasetRow.querySelector('.data_category').value,
+                ethics
+            });
+        }
 
         const hasModelData = name || infoLink || category || datasets.length > 0;
         if (!hasModelData) continue;
@@ -240,54 +324,62 @@ function generateSQL() {
             return null;
         }
 
-        models.push({
-            id: window.crypto.randomUUID(),
-            name,
-            infoLink,
-            category,
-            datasets
-        });
+        modelData.push({ id: createId(), name, infoLink, category, datasets });
     }
+    const softwareId = createId();
+    const optionalValue = value => value || null;
 
-    const datePrefix = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-    const fileName = `submissions/${datePrefix}-${slugify(softwareName)}.sql`;
-    document.getElementById('fileNamePreview').textContent = fileName;
+    const getUtcTimestamp = () => {
+        return new Date()
+        .toISOString()        // "2026-11-19T20:44:05.123Z"
+        .slice(0, 19)         // "2026-11-19T20:44:05"
+        .replace(/[T:]/g, '-'); // "2026-11-19-20-44-05"
+        };
+    const now = getUtcTimestamp();
 
-    const lines = [
-        `-- Migration generated on ${new Date().toISOString()}`,
-        `PRAGMA foreign_keys = ON;`,
-        `BEGIN TRANSACTION;`,
-        ``,
-        `INSERT INTO softwares (software_id, software_name, software_website_link, is_accessible_freely)`,
-        `VALUES (${sqlVal(softwareId)}, ${sqlVal(softwareName)}, ${sqlVal(softwareWebsite)}, ${isAccessibleFreely});`
-    ];
+    const slug = softwareName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'software';
+    const fileName = `${slug}_${softwareId}.json`;
 
-    publications.forEach(publication => {
-        lines.push(
-            ``,
-            `INSERT INTO publications (publication_id, software_id, journal_article_title, journal_article_URI, publication_type)`,
-            `VALUES (${sqlVal(publication.id)}, ${sqlVal(softwareId)}, ${sqlVal(publication.title)}, ${sqlVal(publication.uri)}, ${sqlVal(publication.type)});`
-        );
-    });
+    const data = {
+        generator_info: {
+            generation_datetime: now,
+            file_name: fileName,
+        },
+        software: {
+            software_id: softwareId,
+            software_name: softwareName,
+            software_website_link: optionalValue(softwareWebsite),
+            is_accessible_freely: document.getElementById('is_accessible_freely').checked ? 1 : 0
+        },
+        publications: publicationData.map(publication => ({
+            publication_id: createId(),
+            software_id: softwareId,
+            journal_article_title: publication.title,
+            journal_article_URI: optionalValue(publication.uri),
+            publication_type: publication.type
+        })),
+        mlmodels: modelData.map(model => ({
+            ml_model_id: model.id,
+            software_id: softwareId,
+            ml_model_name: model.name,
+            ml_model_info_link: optionalValue(model.infoLink),
+            ml_model_category: optionalValue(model.category)
+        })),
+        datasets: modelData.flatMap(model =>
+            model.datasets.map(dataset => ({
+                dataset_id: createId(),
+                ml_model_id: model.id,
+                dataset_name: dataset.name,
+                dataset_url: optionalValue(dataset.url),
+                data_category: dataset.category,
+                dataset_ethics: optionalValue(dataset.ethics)
+            }))
+        )
+    };
 
-    models.forEach(model => {
-        lines.push(
-            ``,
-            `INSERT INTO mlmodels (ml_model_id, software_id, ml_model_name, ml_model_info_link, ml_model_category)`,
-            `VALUES (${sqlVal(model.id)}, ${sqlVal(softwareId)}, ${sqlVal(model.name)}, ${sqlVal(model.infoLink)}, ${sqlVal(model.category)});`
-        );
-
-        model.datasets.forEach(dataset => {
-            lines.push(
-                ``,
-                `INSERT INTO datasets (dataset_id, ml_model_id, dataset_name, dataset_url, data_category, dataset_ethics)`,
-                `VALUES (${sqlVal(dataset.id)}, ${sqlVal(model.id)}, ${sqlVal(dataset.name)}, ${sqlVal(dataset.url)}, ${sqlVal(dataset.category)}, ${sqlVal(dataset.ethics)});`
-            );
-        });
-    });
-
-    lines.push(``, `COMMIT;`);
-    const sqlText = lines.join('\n');
-    document.getElementById('sqlOutput').textContent = sqlText;
-    return { fileName, sqlText, name: softwareName };
+    // const fileName = `${slug}.json`;
+    const jsonText = JSON.stringify(data, null, 2);
+    document.getElementById('jsonOutput').textContent = jsonText;
+    status.textContent = 'JSON generated.';
+    return { fileName, jsonText };
 }

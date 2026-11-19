@@ -9,7 +9,7 @@
     >
     <title>AutoMeta Generator</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="script.js" defer></script>
+    <script src="script.js?v=2" defer></script>
 </head>
 <body>
 
@@ -22,13 +22,19 @@
     <h3>What this page does</h3>
     <ul class="muted-copy">
         <li>Takes input metadata,</li>
-        <li>Generates SQL migration scripts, and</li>
-        <li>Opens a GitHub Pull Request for review to add to the database.</li>
+        <li>Generates a JSON file that you can copy or download.</li>
     </ul>
 
 
 
     <form id="metaForm">
+        <div class="add-section">
+            <label class="checkbox-label">
+                <input type="checkbox" id="fillExampleData">
+                <span>Fill form with example data</span>
+            </label>
+        </div>
+
         <details open>
             <summary>Software</summary>
             <div class="form-grid">
@@ -68,16 +74,15 @@
         </details>
 
         <div class="action-buttons">
-            <button type="button" class="btn btn-sec btn-preview-sql" id="generateSQLButton">Preview SQL</button>
-            <button type="button" class="btn btn-sec btn-github-pr" id="submitViaWebPRButton">Incorporate into database (open GitHub Pull Request)</button>
-            <!-- <button type="button" class="btn" id="submitViaGitHubAPIButton">Auto-Commit & Open PR (With Token)</button> -->
+            <button type="button" class="btn btn-sec btn-preview-json" id="generateJSONButton">Preview JSON</button>
+            <button type="button" class="btn btn-sec" id="copyJSONButton">Copy JSON</button>
+            <button type="button" class="btn btn-sec" id="downloadJSONButton">Download JSON</button>
         </div>
     </form>
 
-
-    <h3>Generated Migration File: <code id="fileNamePreview"></code></h3>
-    <pre id="sqlOutput">-- Fill out the form and click "Preview SQL" to see what will be sent to GitHub.</pre>
-
+    <h3>Generated JSON</h3>
+    <pre id="jsonOutput" aria-label="Generated JSON">Fill out the form and click "Preview JSON" to see the generated metadata.</pre>
+    <p id="jsonStatus" class="muted-copy" role="status" aria-live="polite"></p>
 
 </body>
 </html>
