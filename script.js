@@ -110,9 +110,10 @@ function addMlmodelSection() {
                 <label>ML model category</label>
                 <select class="drop-down-menu ml_model_category">
                     <option id="ml_model_category" value="">Select a category</option>
-                    <option id="ml_model_category" value="author">author</option>
-                    <option id="ml_model_category" value="contributor">contributor</option>
-                    <option id="ml_model_category" value="maintainer">maintainer</option>
+                    <option id="ml_model_category" value="active learning">Active learning</option>
+                    <option id="ml_model_category" value="clustering">Clustering</option>
+                    <option id="ml_model_category" value="large language model">Large Language Model (LLM)</option>
+                    <option id="ml_model_category" value="classification">Classification</option>
                     <option id="ml_model_category" value="unsure">I don't know</option>
                 </select>
             </div>
@@ -182,7 +183,7 @@ document.getElementById('fillExampleData').addEventListener('change', event => {
     const modelRow = modelsContainer.querySelector('.mlmodel-row');
     modelRow.querySelector('.ml_model_name').value = 'Example machine learning model';
     modelRow.querySelector('.ml_model_info_link').value = 'https://example.org/model';
-    modelRow.querySelector('.ml_model_category').value = 'contributor';
+    modelRow.querySelector('.ml_model_category').value = 'clustering';
 
     const datasetsContainer = modelRow.querySelector('.datasets-container');
     addDatasetRow(datasetsContainer);
