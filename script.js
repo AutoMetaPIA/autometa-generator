@@ -108,14 +108,31 @@ function addMlmodelSection() {
             </div>
             <div>
                 <label>ML model category</label>
-                <select class="drop-down-menu ml_model_category">
-                    <option id="ml_model_category" value="">Select a category</option>
-                    <option id="ml_model_category" value="active learning">Active learning</option>
-                    <option id="ml_model_category" value="clustering">Clustering</option>
-                    <option id="ml_model_category" value="large language model">Large Language Model (LLM)</option>
-                    <option id="ml_model_category" value="classification">Classification</option>
-                    <option id="ml_model_category" value="unsure">I don't know</option>
-                </select>
+                <details class="category-dropdown">
+                    <summary class="category-dropdown-summary">Select categories</summary>
+                    <div class="category-dropdown-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="ml_model_category" value="active learning">
+                            <span>Active learning</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="ml_model_category" value="clustering">
+                            <span>Clustering</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="ml_model_category" value="large language model">
+                            <span>Large Language Model (LLM)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="ml_model_category" value="classification">
+                            <span>Classification</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="ml_model_category" value="unsure">
+                            <span>I don't know</span>
+                        </label>
+                    </div>
+                </details>
             </div>
         </div>
         <div class="model-datasets">
@@ -129,6 +146,14 @@ function addMlmodelSection() {
     `;
 
     document.getElementById('mlmodelsContainer').appendChild(row);
+}
+
+function updateCategoryDropdownSummary(dropdown) {
+    const selectedCount = dropdown.querySelectorAll('.ml_model_category:checked').length;
+    const summary = dropdown.querySelector('.category-dropdown-summary');
+    summary.textContent = selectedCount
+        ? `${selectedCount} categor${selectedCount === 1 ? 'y' : 'ies'} selected`
+        : 'Select categories';
 }
 
 document.getElementById('addMlmodelButton').addEventListener('click', addMlmodelSection);
@@ -150,6 +175,10 @@ document.getElementById('mlmodelsContainer').addEventListener('click', event => 
 
     const removeModelButton = event.target.closest('.remove-model-button');
     if (removeModelButton) removeModelButton.closest('.mlmodel-row').remove();
+});
+document.getElementById('mlmodelsContainer').addEventListener('change', event => {
+    if (!(event.target instanceof HTMLInputElement) || !event.target.matches('.ml_model_category')) return;
+    updateCategoryDropdownSummary(event.target.closest('.category-dropdown'));
 });
 
 document.getElementById('fillExampleData').addEventListener('change', event => {
@@ -183,7 +212,9 @@ document.getElementById('fillExampleData').addEventListener('change', event => {
     const modelRow = modelsContainer.querySelector('.mlmodel-row');
     modelRow.querySelector('.ml_model_name').value = 'Example machine learning model';
     modelRow.querySelector('.ml_model_info_link').value = 'https://example.org/model';
-    modelRow.querySelector('.ml_model_category').value = 'clustering';
+    const categoryDropdown = modelRow.querySelector('.category-dropdown');
+    categoryDropdown.querySelector('.ml_model_category[value="clustering"]').checked = true;
+    updateCategoryDropdownSummary(categoryDropdown);
 
     const datasetsContainer = modelRow.querySelector('.datasets-container');
     addDatasetRow(datasetsContainer);
@@ -306,7 +337,8 @@ function generateJSON() {
     for (const row of document.querySelectorAll('#mlmodelsContainer .mlmodel-row')) {
         const name = row.querySelector('.ml_model_name').value.trim();
         const infoLink = row.querySelector('.ml_model_info_link').value.trim();
-        const category = row.querySelector('.ml_model_category').value;
+        const category = [...row.querySelectorAll('.ml_model_category:checked')]
+            .map(option => option.value);
         const datasets = [];
 
         for (const datasetRow of row.querySelectorAll('.dataset-row')) {
@@ -329,7 +361,7 @@ function generateJSON() {
             });
         }
 
-        const hasModelData = name || infoLink || category || datasets.length > 0;
+        const hasModelData = name || infoLink || category.length > 0 || datasets.length > 0;
         if (!hasModelData) continue;
 
         if (!name) {
@@ -377,7 +409,7 @@ function generateJSON() {
             software_id: softwareId,
             ml_model_name: model.name,
             ml_model_info_link: optionalValue(model.infoLink),
-            ml_model_category: optionalValue(model.category)
+            ml_model_category: model.category.length ? model.category : null
         })),
         datasets: modelData.flatMap(model =>
             model.datasets.map(dataset => ({

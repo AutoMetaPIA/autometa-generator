@@ -66,6 +66,37 @@ textarea {
     box-sizing: border-box;
 }
 
+.category-dropdown {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+.category-dropdown-options {
+    position: absolute;
+    z-index: 1;
+    top: calc(100% + 0.25rem);
+    left: 0;
+    right: 0;
+    display: grid;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    background: #fff;
+    border: 1px solid var(--details-card-border);
+    border-radius: 4px;
+    box-shadow: 0 4px 8px #00000020;
+}
+
+.category-dropdown-options .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    margin: 0;
+}
+
 .person-row {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr auto;
